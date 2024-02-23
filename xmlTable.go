@@ -244,6 +244,7 @@ type Table struct {
 	ShowHeaderRow     *bool
 	ShowLastColumn    bool
 	ShowRowStripes    *bool
+	FilterColumns     []int // 0-based index of table columns with filters
 }
 
 // AutoFilterOptions directly maps the auto filter settings.

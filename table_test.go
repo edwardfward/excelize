@@ -85,6 +85,33 @@ func TestAddTable(t *testing.T) {
 	f.Pkg.Store("xl/tables/tableSingleCells1.xml", MacintoshCyrillicCharset)
 	assert.NoError(t, f.AddTable("Sheet1", &Table{Range: "A1:B2"}))
 	assert.NoError(t, f.Close())
+
+	// Test custom filter columns.
+	f, err = prepareTestBook1()
+	assert.NoError(t, err)
+	_, err = f.NewSheet("Sheet3")
+	assert.NoError(t, err)
+	assert.NoError(t, f.AddTable("Sheet3", &Table{
+		Name:          "customFilters",
+		Range:         "A1:E5",
+		FilterColumns: []int{0, 1, 3},
+	}))
+
+	// Too many filter columns.
+	assert.NoError(t, f.DeleteTable("customFilters"))
+	assert.Error(t, f.AddTable("Sheet3", &Table{
+		Name:          "customFilters",
+		Range:         "A1:E5",
+		FilterColumns: []int{0, 1, 2, 3, 4, 5},
+	}))
+
+	// Column number out of range.
+	assert.Error(t, f.AddTable("Sheet3", &Table{
+		Name:          "customFilters",
+		Range:         "A1:E5",
+		FilterColumns: []int{0, 1, 2, 3, 4, 10},
+	}))
+
 }
 
 func TestGetTables(t *testing.T) {

@@ -373,6 +373,45 @@ func (f *File) addTable(sheet, tableXML string, x1, y1, x2, y2, i int, opts *Tab
 		t.AutoFilter = nil
 		t.HeaderRowCount = intPtr(0)
 	}
+
+	// Select columns to filter.
+	if !hideHeaderRow && opts.FilterColumns != nil {
+		width := x2 - x1 + 1
+		ff := make([]*xlsxFilterColumn, width)
+
+		if len(opts.FilterColumns) > width {
+			return newInvalidAutoFilterColumnError(fmt.Sprintf("filter columns (%d) exceeds table width",
+				len(opts.FilterColumns)))
+		}
+
+		cc := make(map[int]bool)
+		for _, c := range opts.FilterColumns {
+			if c < 0 || c >= width {
+				return newInvalidAutoFilterColumnError(fmt.Sprintf("filter column index %d out of range", c))
+			}
+			cc[c] = true
+		}
+
+		// Zero-based column index starts from the first column
+		// of the table.
+		for i := 0; i < width; i++ {
+			showFilter := false
+			if cc[i] {
+				showFilter = true
+			}
+
+			ff[i] = &xlsxFilterColumn{
+				ColID:        i,
+				HiddenButton: !showFilter,
+			}
+		}
+
+		t.AutoFilter = &xlsxAutoFilter{
+			Ref:          ref,
+			FilterColumn: ff,
+		}
+	}
+
 	table, err := xml.Marshal(t)
 	f.saveFileList(tableXML, table)
 	return err

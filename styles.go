@@ -2182,9 +2182,7 @@ func setCellXfs(style *xlsxStyleSheet, fontID, numFmtID, fillID, borderID int, a
 	xfID := 0
 	xf.XfID = &xfID
 
-	style.mu.Lock()
 	style.CellXfs.Xf = append(style.CellXfs.Xf, xf)
-	style.mu.Unlock()
 
 	return style.CellXfs.Count - 1, nil
 }

@@ -2184,10 +2184,9 @@ func setCellXfs(style *xlsxStyleSheet, fontID, numFmtID, fillID, borderID int, a
 
 	style.mu.Lock()
 	style.CellXfs.Xf = append(style.CellXfs.Xf, xf)
-	count := style.CellXfs.Count - 1
 	style.mu.Unlock()
 
-	return count, nil
+	return style.CellXfs.Count - 1, nil
 }
 
 // GetCellStyle provides a function to get cell style index by given worksheet

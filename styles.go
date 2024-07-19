@@ -2181,8 +2181,13 @@ func setCellXfs(style *xlsxStyleSheet, fontID, numFmtID, fillID, borderID int, a
 	}
 	xfID := 0
 	xf.XfID = &xfID
+
+	style.mu.Lock()
 	style.CellXfs.Xf = append(style.CellXfs.Xf, xf)
-	return style.CellXfs.Count - 1, nil
+	count := style.CellXfs.Count - 1
+	style.mu.Unlock()
+
+	return count, nil
 }
 
 // GetCellStyle provides a function to get cell style index by given worksheet
